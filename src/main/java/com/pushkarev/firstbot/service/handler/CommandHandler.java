@@ -1,11 +1,13 @@
 package com.pushkarev.firstbot.service.handler;
 
 import com.pushkarev.firstbot.telegram.Bot;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+@Slf4j
 @Service
 public class CommandHandler {
 
@@ -21,6 +23,7 @@ public class CommandHandler {
     }
 
     private BotApiMethod<?> start(Message message) {
+        log.info("Starting bot...{}", message.getText());
         return SendMessage.builder()
                 .chatId(message.getChatId())
                 .text("""
