@@ -1,8 +1,8 @@
 package com.pushkarev.firstbot.service.handler;
 
-import com.pushkarev.firstbot.service.factory.KeyboardFactory;
 import com.pushkarev.firstbot.service.manager.FeedbackManager;
 import com.pushkarev.firstbot.service.manager.HelpManager;
+import com.pushkarev.firstbot.service.manager.StartManager;
 import com.pushkarev.firstbot.telegram.Bot;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -13,10 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.List;
-
 import static com.pushkarev.firstbot.service.data.Command.*;
-import static com.pushkarev.firstbot.service.data.CallbackData.*;
 
 @Slf4j
 @Service
@@ -24,17 +21,17 @@ import static com.pushkarev.firstbot.service.data.CallbackData.*;
 
 public class CommandHandler {
 
-    final KeyboardFactory keyboardFactory;
     final FeedbackManager feedbackManager;
     final HelpManager helpManager;
+    final StartManager startManager;
 
     @Autowired
-    public CommandHandler(KeyboardFactory keyboardFactory,
-                          FeedbackManager feedbackManager,
-                          HelpManager helpManager) {
-        this.keyboardFactory = keyboardFactory;
+    public CommandHandler(FeedbackManager feedbackManager,
+                          HelpManager helpManager,
+                          StartManager startManager) {
         this.feedbackManager = feedbackManager;
         this.helpManager = helpManager;
+        this.startManager = startManager;
     }
 
     public BotApiMethod<?> answer(Message message, Bot bot) {
@@ -42,7 +39,7 @@ public class CommandHandler {
 
         switch (command) {
             case START -> {
-                return start(message);
+                return startManager.answerCommand(message);
             }
             case FEEDBACK_COMMAND -> {
                 return feedbackManager.answerCommand(message);
@@ -60,26 +57,6 @@ public class CommandHandler {
         return SendMessage.builder()
                 .chatId(message.getChatId())
                 .text("Неподдерживаемая команда")
-                .build();
-    }
-
-    private BotApiMethod<?> start(Message message) {
-        log.info("Starting bot...{}", message.getText());
-        return SendMessage.builder()
-                .chatId(message.getChatId())
-                .replyMarkup(keyboardFactory.getInlineKeyboardMarkup(
-                        List.of("Помощь", "Обратная связь"),
-                        List.of(2),
-                        List.of(HELP, FEEDBACK)
-                ))
-                .text("""
-                        🖖Приветствую в Tutor-Bot, инструменте для упрощения взаимодействия репититора и ученика.
-                        
-                        Что бот умеет?
-                        📌 Составлять расписание
-                        📌 Прикреплять домашние задания
-                        📌 Ввести контроль успеваемости
-                        """)
                 .build();
     }
 }
