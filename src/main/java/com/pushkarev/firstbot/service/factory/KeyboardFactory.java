@@ -13,6 +13,9 @@ import java.util.List;
 @Component
 public class KeyboardFactory {
 
+    /**
+     * InlineKeyboard - клавиатура которая появляется под сообщениями бота
+     */
     public InlineKeyboardMarkup getInlineKeyboardMarkup(
             List<String> text,
             List<Integer> configuration,
@@ -38,6 +41,10 @@ public class KeyboardFactory {
         return keyboardMarkup;
     }
 
+    /**
+     * ReplyKeyboard - нужна, чтобы подсказывать пользователю, какое сообщение могу отправить в данный момент.
+     * Клавиатура в Telegram, которая рекомендует пользователю, какое текстовое сообщение отправить
+     */
     public ReplyKeyboardMarkup getReplyKeyboardMarkup(
             List<String> text,
             List<Integer> configuration

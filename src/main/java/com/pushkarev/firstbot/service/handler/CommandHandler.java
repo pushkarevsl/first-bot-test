@@ -1,6 +1,8 @@
 package com.pushkarev.firstbot.service.handler;
 
 import com.pushkarev.firstbot.service.factory.KeyboardFactory;
+import com.pushkarev.firstbot.service.manager.FeedbackManager;
+import com.pushkarev.firstbot.service.manager.HelpManager;
 import com.pushkarev.firstbot.telegram.Bot;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -14,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.List;
 
 import static com.pushkarev.firstbot.service.data.Command.*;
+import static com.pushkarev.firstbot.service.data.CallbackData.*;
 
 @Slf4j
 @Service
@@ -22,10 +25,16 @@ import static com.pushkarev.firstbot.service.data.Command.*;
 public class CommandHandler {
 
     final KeyboardFactory keyboardFactory;
+    final FeedbackManager feedbackManager;
+    final HelpManager helpManager;
 
     @Autowired
-    public CommandHandler(KeyboardFactory keyboardFactory) {
+    public CommandHandler(KeyboardFactory keyboardFactory,
+                          FeedbackManager feedbackManager,
+                          HelpManager helpManager) {
         this.keyboardFactory = keyboardFactory;
+        this.feedbackManager = feedbackManager;
+        this.helpManager = helpManager;
     }
 
     public BotApiMethod<?> answer(Message message, Bot bot) {
@@ -35,11 +44,11 @@ public class CommandHandler {
             case START -> {
                 return start(message);
             }
-            case FEEDBACK -> {
-                return feedback(message);
+            case FEEDBACK_COMMAND -> {
+                return feedbackManager.answerCommand(message);
             }
-            case HELP -> {
-                return help(message);
+            case HELP_COMMAND -> {
+                return helpManager.answerCommand(message);
             }
             default -> {
                 return defaultAnswer(message);
@@ -54,36 +63,6 @@ public class CommandHandler {
                 .build();
     }
 
-    private BotApiMethod<?> help(Message message) {
-        return SendMessage.builder()
-                .chatId(message.getChatId())
-                .text("""
-                        📍 Доступные команды:
-                        - start
-                        - help
-                        - feedback
-                        
-                        📍 Доступные функции:
-                        - Расписание
-                        - Домашнее задание
-                        - Контроль успеваемости
-                       """)
-                .build();
-    }
-
-    private BotApiMethod<?> feedback(Message message) {
-        return SendMessage.builder()
-                .chatId(message.getChatId())
-                .text("""
-                        📍 Ссылки для обратной связи
-                        GitHub - https://github.com/pushkarevsl
-                        LinkedIn - https://www.linkedin.com/in/sergey-pushkaryov-806259179/
-                        Telegram - https://t.me/pushkarev_s
-                        """)
-                .disableWebPagePreview(true)
-                .build();
-    }
-
     private BotApiMethod<?> start(Message message) {
         log.info("Starting bot...{}", message.getText());
         return SendMessage.builder()
@@ -91,15 +70,15 @@ public class CommandHandler {
                 .replyMarkup(keyboardFactory.getInlineKeyboardMarkup(
                         List.of("Помощь", "Обратная связь"),
                         List.of(2),
-                        List.of("asd", "dfg")
+                        List.of(HELP, FEEDBACK)
                 ))
                 .text("""
                         🖖Приветствую в Tutor-Bot, инструменте для упрощения взаимодействия репититора и ученика.
-                                                
+                        
                         Что бот умеет?
                         📌 Составлять расписание
                         📌 Прикреплять домашние задания
-                        📌 Ввести контроль успеваемости                        
+                        📌 Ввести контроль успеваемости
                         """)
                 .build();
     }
