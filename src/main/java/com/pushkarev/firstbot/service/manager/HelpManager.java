@@ -1,47 +1,61 @@
 package com.pushkarev.firstbot.service.manager;
 
+import com.pushkarev.firstbot.service.factory.AnswerMethodFactory;
+import com.pushkarev.firstbot.service.factory.KeyboardFactory;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class HelpManager {
 
+    final AnswerMethodFactory methodFactory;
+    final KeyboardFactory keyboardFactory;
+
+    @Autowired
+    public HelpManager(AnswerMethodFactory methodFactory, KeyboardFactory keyboardFactory) {
+        this.methodFactory = methodFactory;
+        this.keyboardFactory = keyboardFactory;
+    }
+
     public BotApiMethod<?> answerCommand(Message message) {
-        return SendMessage.builder()
-                .chatId(message.getChatId())
-                .text("""
-                        📍 Доступные команды:
-                        - start
-                        - help
-                        - feedback
+        return methodFactory.getSendMessage(
+                message.getChatId(),
+                """
+                         📍 Доступные команды:
+                         - start 
+                         - help
+                         - feedback
                         
-                        📍 Доступные функции:
-                        - Расписание
-                        - Домашнее задание
-                        - Контроль успеваемости
-                       """)
-                .build();
+                         📍 Доступные функции:
+                         - Расписание
+                         - Домашнее задание
+                         - Контроль успеваемости
+                        """,
+                null
+        );
     }
 
     public BotApiMethod<?> answerCallbackQuery(CallbackQuery callbackQuery) {
-        return EditMessageText.builder()
-                .chatId(callbackQuery.getMessage().getChatId())
-                .messageId(callbackQuery.getMessage().getMessageId())
-                .text("""
-                        📍 Доступные команды:
-                        - start
-                        - help
-                        - feedback
+        return methodFactory.getEditMessageText(
+                callbackQuery,
+                """
+                         📍 Доступные команды:
+                         - start
+                         - help
+                         - feedback
                         
-                        📍 Доступные функции:
-                        - Расписание
-                        - Домашнее задание
-                        - Контроль успеваемости
-                       """)
-                .build();
+                         📍 Доступные функции:
+                         - Расписание
+                         - Домашнее задание
+                         - Контроль успеваемости
+                        """,
+                null
+        );
     }
 }
