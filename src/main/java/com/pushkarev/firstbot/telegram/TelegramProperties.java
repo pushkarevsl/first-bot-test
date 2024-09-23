@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class TelegramProperties {
-
     String username;
     String token;
     String path;
