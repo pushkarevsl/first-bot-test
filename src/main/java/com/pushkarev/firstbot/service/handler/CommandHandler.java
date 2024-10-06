@@ -2,6 +2,7 @@ package com.pushkarev.firstbot.service.handler;
 
 import com.pushkarev.firstbot.service.manager.feedback.FeedbackManager;
 import com.pushkarev.firstbot.service.manager.help.HelpManager;
+import com.pushkarev.firstbot.service.manager.progressControl.ProgressControlManager;
 import com.pushkarev.firstbot.service.manager.start.StartManager;
 import com.pushkarev.firstbot.service.manager.task.TaskManager;
 import com.pushkarev.firstbot.service.manager.timeTable.TimetableManager;
@@ -28,18 +29,21 @@ public class CommandHandler {
     final StartManager startManager;
     final TimetableManager timetableManager;
     final TaskManager taskManager;
+    private final ProgressControlManager progressControlManager;
 
     @Autowired
     public CommandHandler(FeedbackManager feedbackManager,
                           HelpManager helpManager,
                           StartManager startManager,
                           TimetableManager timetableManager,
-                          TaskManager taskManager) {
+                          TaskManager taskManager,
+                          ProgressControlManager progressControlManager) {
         this.feedbackManager = feedbackManager;
         this.helpManager = helpManager;
         this.startManager = startManager;
         this.timetableManager = timetableManager;
         this.taskManager = taskManager;
+        this.progressControlManager = progressControlManager;
     }
 
     public BotApiMethod<?> answer(Message message, Bot bot) {
@@ -60,6 +64,9 @@ public class CommandHandler {
             }
             case TASK -> {
                 return taskManager.answerCommand(message, bot);
+            }
+            case PROGRESS -> {
+                return progressControlManager.answerCommand(message, bot);
             }
             default -> {
                 return defaultAnswer(message);
