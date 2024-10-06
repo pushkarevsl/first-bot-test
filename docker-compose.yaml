@@ -1,0 +1,17 @@
+version: '3.1'
+
+volumes:
+  pg_testBot:
+
+services:
+  testBot_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=testBot_db
+    volumes:
+      - pg_testBot:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
