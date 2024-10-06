@@ -1,5 +1,7 @@
 package com.pushkarev.firstbot.service;
 
+import com.pushkarev.firstbot.entity.User;
+import com.pushkarev.firstbot.repository.UserRepo;
 import com.pushkarev.firstbot.service.handler.CallBackQueryHandler;
 import com.pushkarev.firstbot.service.handler.CommandHandler;
 import com.pushkarev.firstbot.service.handler.MessageHandler;
@@ -21,23 +23,29 @@ public class UpdateDispatcher {
     final MessageHandler messageHandler;
     final CommandHandler commandHandler;
     final CallBackQueryHandler callbackQueryHandler;
+    final UserRepo userRepo;
 
     @Autowired
     public UpdateDispatcher(MessageHandler messageHandler,
                             CommandHandler commandHandler,
-                            CallBackQueryHandler callbackQueryHandler) {
+                            CallBackQueryHandler callbackQueryHandler,
+                            UserRepo userRepo) {
         this.messageHandler = messageHandler;
         this.commandHandler = commandHandler;
         this.callbackQueryHandler = callbackQueryHandler;
+        this.userRepo = userRepo;
     }
 
     public BotApiMethod<?> distribute(Update update, Bot bot) {
-        if(update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             return callbackQueryHandler.answer(update.getCallbackQuery(), bot);
         }
-        if(update.hasMessage()){
+        if (update.hasMessage()) {
             Message message = update.getMessage();
-            if(message.hasText()){
+            if (message.hasText()) {
+                userRepo.save(User.builder()
+                        .chatId(message.getChatId())
+                        .build());
                 if (message.getText().charAt(0) == '/') {
                     return commandHandler.answer(message, bot);
                 }
