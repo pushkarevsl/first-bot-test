@@ -1,7 +1,9 @@
-package com.pushkarev.firstbot.service.manager;
+package com.pushkarev.firstbot.service.manager.help;
 
 import com.pushkarev.firstbot.service.factory.AnswerMethodFactory;
 import com.pushkarev.firstbot.service.factory.KeyboardFactory;
+import com.pushkarev.firstbot.service.manager.AbstractManager;
+import com.pushkarev.firstbot.telegram.Bot;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HelpManager {
+public class HelpManager extends AbstractManager {
 
     final AnswerMethodFactory methodFactory;
     final KeyboardFactory keyboardFactory;
@@ -23,7 +25,8 @@ public class HelpManager {
         this.keyboardFactory = keyboardFactory;
     }
 
-    public BotApiMethod<?> answerCommand(Message message) {
+    @Override
+    public BotApiMethod<?> answerCommand(Message message, Bot bot) {
         return methodFactory.getSendMessage(
                 message.getChatId(),
                 """
@@ -41,7 +44,8 @@ public class HelpManager {
         );
     }
 
-    public BotApiMethod<?> answerCallbackQuery(CallbackQuery callbackQuery) {
+    @Override
+    public BotApiMethod<?> answerCallbackQuery(CallbackQuery callbackQuery, Bot bot) {
         return methodFactory.getEditMessageText(
                 callbackQuery,
                 """
@@ -57,5 +61,10 @@ public class HelpManager {
                         """,
                 null
         );
+    }
+
+    @Override
+    public BotApiMethod<?> answerMessage(Message message, Bot bot) {
+        return null;
     }
 }
