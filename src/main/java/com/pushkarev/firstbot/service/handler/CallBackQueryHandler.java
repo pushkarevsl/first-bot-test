@@ -2,6 +2,7 @@ package com.pushkarev.firstbot.service.handler;
 
 import com.pushkarev.firstbot.service.manager.feedback.FeedbackManager;
 import com.pushkarev.firstbot.service.manager.help.HelpManager;
+import com.pushkarev.firstbot.service.manager.progressControl.ProgressControlManager;
 import com.pushkarev.firstbot.service.manager.task.TaskManager;
 import com.pushkarev.firstbot.service.manager.timeTable.TimetableManager;
 import com.pushkarev.firstbot.telegram.Bot;
@@ -22,17 +23,20 @@ public class CallBackQueryHandler {
     final FeedbackManager feedbackManager;
     final TimetableManager timetableManager;
     final TaskManager taskManager;
+    private final ProgressControlManager progressControlManager;
 
     @Autowired
     public CallBackQueryHandler(
             HelpManager helpManager,
             FeedbackManager feedbackManager,
             TimetableManager timetableManager,
-            TaskManager taskManager) {
+            TaskManager taskManager,
+            ProgressControlManager progressControlManager) {
         this.helpManager = helpManager;
         this.feedbackManager = feedbackManager;
         this.timetableManager = timetableManager;
         this.taskManager = taskManager;
+        this.progressControlManager = progressControlManager;
     }
 
     public BotApiMethod<?> answer(CallbackQuery callbackQuery, Bot bot) {
@@ -45,6 +49,10 @@ public class CallBackQueryHandler {
 
         if(TASK.equals(keyWord)) {
             return taskManager.answerCallbackQuery(callbackQuery, bot);
+        }
+
+        if(PROGRESS.equals(keyWord)) {
+            return progressControlManager.answerCallbackQuery(callbackQuery, bot);
         }
 
         switch (callbackData) {
